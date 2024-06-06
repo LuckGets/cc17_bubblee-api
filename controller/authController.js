@@ -1,11 +1,42 @@
+const authService = require("../services/authService");
+const asyncWrapper = require("../utils/asyncWrapper");
+const bcryptService = require("../validation/bcryptService/bcrypt");
+const jwtService = require("../validation/jsonwebtoken/jwt");
 const authController = {};
 
-authController.createUser = (req, res, next) => {
-  res.status(200).json({ message: "This is create user" });
-};
+authController.createUser = asyncWrapper(async (req, res, next) => {
+  const data = req.input;
+  if (!req.input.role) {
+    data.role = "USER";
+  }
 
-authController.login = (req, res, next) => {
-  res.status(200).json({ message: "login successfully" });
-};
+  const hashedPassword = await bcryptService.hash(data.password);
+  data.password = hashedPassword;
+  await authService.createUser(data);
+  res.status(201).json({ message: "User created!" });
+});
+
+authController.login = asyncWrapper(async (req, res, next) => {
+  const data = req.input;
+  const user = await authService.findUserByEmailOrPhone(
+    data.phone || data.email
+  );
+  if (!user) {
+    return res.status(400).json({ message: "User did not exist" });
+  }
+
+  const isPasswordCorrect = await bcryptService.compare(
+    data.password,
+    user.password
+  );
+  if (!isPasswordCorrect) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+  delete user.password
+
+  const accessToken = jwtService.sign(user);
+
+  res.status(200).json({ user, accessToken });
+});
 
 module.exports = authController;
