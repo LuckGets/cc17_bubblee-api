@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Users {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(50)
+  email       String?       @unique
+  phone       String        @unique @db.VarChar(10)
+  password    String        @db.VarChar(190)
+  role        Role
+  reservation Reservation[]
+}
+
+model CarsModel {
+  id              Int    @id @default(autoincrement())
+  carModel        String @map("car_model") @db.VarChar(30)
+  maxPassengerNum Int    @map("maximum_passenger_num")
+  costPerKM       Int    @map("cost_per_km")
+
+  carImage    CarImage[]
+  cars        Cars[]
+  reservation Reservation[]
+
+  @@map("cars_model")
+}
+
+model CarImage {
+  id        Int     @id @default(autoincrement())
+  mainImage Boolean @default(false) @map("main_image")
+  imagePath String  @map("image_path") @db.VarChar(191)
+
+  modelId  Int       @map("model_id")
+  carModel CarsModel @relation(fields: [modelId], references: [id])
+
+  @@map("car_image")
+}
+
+model Cars {
+  id       Int    @id @default(autoincrement())
+  carPlate String @db.VarChar(30)
+  modelId  Int    @map("model_id")
+  driverId Int    @map("driver_id")
+
+  carModel    CarsModel[]
+  driver      Drivers?
+  reservation Reservation[]
+}
+
+model Drivers {
+  id    Int    @id @default(autoincrement())
+  name  String @db.VarChar(50)
+  image String @db.VarChar(100)
+
+  carId       Int           @unique @map("car_id")
+  car         Cars          @relation(fields: [carId], references: [id])
+  reservation Reservation[]
+}
+
+enum TransactionType {
+  qrcode
+  credit
+  cash
+}
+
+model Transaction {
+  id              Int             @id @default(autoincrement())
+  orderId         Int             @map("order_id")
+  type            TransactionType
+  transactionDate DateTime        @default(now()) @map("transaction_date") @db.Timestamp(0)
+
+  reservation Reservation[]
+}
+
+enum OrderStatus {
+  CANCEL
+  RESERVED
+  FINDING
+  FINISHED
+}
+
+model Reservation {
+  id            Int         @id @default(autoincrement())
+  pickupPlace   String      @map("pickup_place") @db.VarChar(190)
+  dropOffPlace  String      @map("dropoff_place") @db.VarChar(190)
+  reservedAt    DateTime    @default(now()) @map("reserved_at") @db.Timestamp(0)
+  updatedAt     DateTime    @updatedAt @map("updated_at") @db.Timestamp(0)
+  totalCost     Decimal     @map("total_cost") @db.Decimal(10, 2)
+  passengerNum  Int         @map("passenger_number")
+  bagNumber     Int?        @map("bag_number")
+  pickUpTime    DateTime    @map("pickup_time") @db.Timestamp(0)
+  orderStatus   OrderStatus @default(FINDING) @map("order_status")
+  pickUpLatLng  String      @map("pickup_latlng") @db.VarChar(90)
+  dropOffLatLng String      @map("dropoff_latlng") @db.VarChar(90)
+  distance      String
+  guestName     String?     @map("guest_name") @db.VarChar(90)
+  guestPhone    String?     @map("guest_phone") @db.VarChar(10)
+  guestMail     String?      @map("guest_mail") @db.VarChar(90)
+
+  userId        Int?         @map("user_id")
+  carId         Int         @map("car_id")
+  modelId       Int         @map("model_id")
+  driverId      Int         @map("driver_id")
+  transactionId Int         @map("transaction_id")
+  user          Users?      @relation(fields: [userId], references: [id])
+  driver        Drivers     @relation(fields: [driverId], references: [id])
+  car           Cars        @relation(fields: [carId], references: [id])
+  carModel      CarsModel   @relation(fields: [modelId], references: [id])
+  transction    Transaction @relation(fields: [transactionId], references: [id])
+}
