@@ -9,10 +9,11 @@ app.use(express.json());
 app.use(cors());
 
 // Import router
-const authRouter = require("./router/authRouter")
+const authRouter = require("./router/authRouter");
+const userRouter = require("./router/userRouter");
 
-app.use("/auth", authRouter)
-
+app.use("/auth", authRouter);
+app.use("/users", userRouter);
 // Not found middleware
 app.use(notFoundMiddleware);
 

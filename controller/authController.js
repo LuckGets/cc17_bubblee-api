@@ -32,11 +32,9 @@ authController.login = asyncWrapper(async (req, res, next) => {
   if (!isPasswordCorrect) {
     return res.status(400).json({ message: "Invalid credentials" });
   }
-  delete user.password
+  const accessToken = jwtService.sign({id : user.id});
 
-  const accessToken = jwtService.sign(user);
-
-  res.status(200).json({ user, accessToken });
+  res.status(200).json({ accessToken });
 });
 
 module.exports = authController;
