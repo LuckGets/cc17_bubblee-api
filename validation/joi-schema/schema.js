@@ -5,6 +5,10 @@ const registerSchema = Joi.object({
   password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{8,24}$")).required(),
   email: Joi.string().email({ tlds: { allow: ["com", "net"] } }),
   phone: Joi.string().pattern(new RegExp("[0-9]{10}$")).required(),
+  confirmPassword : Joi.alternatives()
+  .conditional(Joi.string(), {
+    then: Joi.string().required().valid(Joi.ref("password")),
+  }).strip()
 });
 
 const loginSchema = Joi.object({

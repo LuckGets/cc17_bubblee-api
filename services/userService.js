@@ -9,4 +9,11 @@ userService.findUserById = (id) =>
     },
   });
 
+userService.findUserByPhone = (phone) =>
+  prisma.users.findFirst({
+    where: {
+      phone,
+    },
+  });
+
 module.exports = userService;

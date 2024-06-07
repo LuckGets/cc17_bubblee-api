@@ -4,7 +4,7 @@ const authService = {};
 
 authService.createUser = (data) =>
   prisma.users.create({
-    data,
+    data
   });
 
 authService.findUserByEmailOrPhone = (emailOrPhone) =>
