@@ -16,4 +16,11 @@ userService.findUserByPhone = (phone) =>
     },
   });
 
+userService.findUserByEmailOrPhone = (phone,email) =>
+  prisma.users.findFirst({
+    where: {
+      OR: [{ phone: phone }, { email: email }],
+    },
+  });
+
 module.exports = userService;

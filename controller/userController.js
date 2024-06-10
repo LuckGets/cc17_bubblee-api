@@ -1,8 +1,25 @@
-const userController = {}
+const userService = require("../services/userService");
+const asyncWrapper = require("../utils/asyncWrapper");
 
-userController.getUser = (req,res,next) => {
-  res.status(200).json(req.user)
-}
+const userController = {};
 
+userController.getUser = (req, res, next) => {
+  res.status(200).json(req.user);
+};
 
-module.exports = userController
+userController.findUser = asyncWrapper(async (req, res, next) => {
+  const user = await userService.findUserByEmailOrPhone(
+    req.body.phone,
+    req.body.email
+  );
+  if (user) {
+    delete user.password;
+    res.status(200).json({user : user});
+  }
+
+  if (!user) {
+    res.status(200).json("hello")
+  }
+});
+
+module.exports = userController;

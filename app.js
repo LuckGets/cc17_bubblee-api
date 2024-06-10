@@ -11,9 +11,12 @@ app.use(cors());
 // Import router
 const authRouter = require("./router/authRouter");
 const userRouter = require("./router/userRouter");
+const carRouter = require("./router/carRouter");
 
 app.use("/auth", authRouter);
 app.use("/users", userRouter);
+app.use("/cars", carRouter);
+
 // Not found middleware
 app.use(notFoundMiddleware);
 
