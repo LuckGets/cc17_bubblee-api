@@ -9,5 +9,14 @@ carService.getCarImage = (modelId) =>
     },
   });
 
+carService.getCarImageByFilteringId = modelId => prisma.carImage.findMany({
+  where : {
+    modelId : {
+      notIn : modelId
+    }
+  }
+})
+
+carService.getAllCarImage = () => prisma.carImage.findMany()
 
   module.exports = carService
