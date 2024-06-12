@@ -5,39 +5,53 @@ const carService = {};
 carService.getCarImage = () =>
   prisma.carImage.findMany({
     where: {
-      mainImage : true
+      mainImage: true,
     },
-    include : {
-      carModel : true
-    }
+    include: {
+      carModel: true,
+    },
   });
 
-  carService.getAllCar = () => prisma.carsModel.findMany({
-    include : {
-      carImage : {
-        where : {
-          mainImage : true
-        }
-      }
-    }
-  })
+carService.getCarImageById = (id) =>
+  prisma.carImage.findFirst({
+    where: {
+      mainImage: true,
+      modelId: id,
+    },
+    include: {
+      carModel: true,
+    },
+  });
 
-carService.getCarImageByFilteringId = modelId => prisma.carImage.findMany({
-  where : {
-    modelId : {
-      notIn : modelId
-    }
-  },
-})
+carService.getAllCar = () =>
+  prisma.carsModel.findMany({
+    include: {
+      carImage: {
+        where: {
+          mainImage: true,
+        },
+      },
+    },
+  });
 
-carService.getAllCarImage = () => prisma.carImage.findMany()
+carService.getCarImageByFilteringId = (modelId) =>
+  prisma.carImage.findMany({
+    where: {
+      modelId: {
+        notIn: modelId,
+      },
+    },
+  });
 
-carService.getAllCarDetails = () => prisma.carsModel.findMany()
+carService.getAllCarImage = () => prisma.carImage.findMany();
 
-carService.getCarDetailsById = modelId => prisma.carImage.findMany({
-  where : {
-    modelId
-  }
-}) 
+carService.getAllCarDetails = () => prisma.carsModel.findMany();
 
-  module.exports = carService
+carService.getCarDetailsById = (modelId) =>
+  prisma.carImage.findMany({
+    where: {
+      modelId,
+    },
+  });
+
+module.exports = carService;

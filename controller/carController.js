@@ -20,9 +20,14 @@ carController.getCarImage = asyncWrapper(async (req, res, next) => {
 });
 
 carController.getCarDetailsById = asyncWrapper(async (req, res, next) => {
-  console.log(req.body)
-  const carImageArr = await carService.getCarDetailsById(+req.body.modelId);
+  console.log(req.body);
+  const carImageArr = await carService.getCarImage();
   console.log(carImageArr);
+  res.status(200).json(carImageArr);
+});
+
+carController.getMainImageByCarId = asyncWrapper(async (req, res, next) => {
+  const carImageArr = await carService.getCarImageById(req.body.id);
   res.status(200).json(carImageArr);
 });
 
