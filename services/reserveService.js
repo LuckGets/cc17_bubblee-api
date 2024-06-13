@@ -46,14 +46,25 @@ reserveService.updateTransactionId = (id, orderId) =>
 reserveService.findReserveDetailByOrderId = (id) =>
   prisma.reservation.findUnique({
     where: { id },
+  });
+
+reserveService.findReserveHistoryByUserId = (userId) =>
+  prisma.reservation.findMany({
+    where: {
+      userId: userId,
+    },
+    include: {
+      carModel: true,
+    },
+  });
+
+reserveService.findUserIdByOrderId = (orderId) =>
+  prisma.reservation.findUnique({
+    where: {
+      id: orderId,
+    },
     select: {
-      id: true,
-      pickupPlace: true,
-      dropOffPlace: true,
-      passengerNum: true,
-      bagNumber: true,
-      totalCost: true,
-      reservedAt: true,
+      userId: true,
     },
   });
 

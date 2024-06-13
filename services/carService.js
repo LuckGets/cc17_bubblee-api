@@ -54,4 +54,11 @@ carService.getCarDetailsById = (modelId) =>
     },
   });
 
+carService.getCarInfoById = (id) =>
+  prisma.carsModel.findUnique({
+    where: {
+      id,
+    },
+  });
+
 module.exports = carService;

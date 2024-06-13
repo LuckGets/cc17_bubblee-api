@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.get("/", authenticate, userController.getUser);
 
-router.post("/find", userController.findUser)
+router.post("/find", userController.findUser);
+
+router.post("/compare", authenticate, userController.comparePassword);
 
 module.exports = router;

@@ -5,7 +5,6 @@ const carController = {};
 
 carController.getAllCarDetails = asyncWrapper(async (req, res, next) => {
   const carDetailsArr = await carService.getAllCar();
-  console.log(carDetailsArr);
   res.status(200).json(carDetailsArr);
 });
 
@@ -20,9 +19,7 @@ carController.getCarImage = asyncWrapper(async (req, res, next) => {
 });
 
 carController.getCarDetailsById = asyncWrapper(async (req, res, next) => {
-  console.log(req.body);
   const carImageArr = await carService.getCarImage();
-  console.log(carImageArr);
   res.status(200).json(carImageArr);
 });
 
