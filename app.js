@@ -12,10 +12,14 @@ app.use(cors());
 const authRouter = require("./router/authRouter");
 const userRouter = require("./router/userRouter");
 const carRouter = require("./router/carRouter");
+const reserveRouter = require("./router/reserveRouter");
+const transactionRouter = require("./router/transactionRouter");
 
 app.use("/auth", authRouter);
 app.use("/users", userRouter);
 app.use("/cars", carRouter);
+app.use("/reserve", reserveRouter);
+app.use("/transaction", transactionRouter);
 
 // Not found middleware
 app.use(notFoundMiddleware);

@@ -82,7 +82,7 @@ enum TransactionType {
 model Transaction {
   id              Int             @id @default(autoincrement())
   orderId         Int             @map("order_id")
-  type            TransactionType
+  type            TransactionType @default(cash)
   transactionDate DateTime        @default(now()) @map("transaction_date") @db.Timestamp(0)
 
   reservation Reservation[]
@@ -111,16 +111,17 @@ model Reservation {
   distance      String
   guestName     String?     @map("guest_name") @db.VarChar(90)
   guestPhone    String?     @map("guest_phone") @db.VarChar(10)
-  guestMail     String?      @map("guest_mail") @db.VarChar(90)
+  guestMail     String?     @map("guest_mail") @db.VarChar(90)
+  isRoundTrip   Boolean     @default(false) @map("is_round_trip")
 
   userId        Int?         @map("user_id")
-  carId         Int         @map("car_id")
-  modelId       Int         @map("model_id")
-  driverId      Int         @map("driver_id")
-  transactionId Int         @map("transaction_id")
-  user          Users?      @relation(fields: [userId], references: [id])
-  driver        Drivers     @relation(fields: [driverId], references: [id])
-  car           Cars        @relation(fields: [carId], references: [id])
-  carModel      CarsModel   @relation(fields: [modelId], references: [id])
-  transction    Transaction @relation(fields: [transactionId], references: [id])
+  carId         Int?         @map("car_id")
+  modelId       Int          @map("model_id")
+  driverId      Int?         @map("driver_id")
+  transactionId Int?         @map("transaction_id")
+  user          Users?       @relation(fields: [userId], references: [id])
+  driver        Drivers?     @relation(fields: [driverId], references: [id])
+  car           Cars?        @relation(fields: [carId], references: [id])
+  carModel      CarsModel    @relation(fields: [modelId], references: [id])
+  transction    Transaction? @relation(fields: [transactionId], references: [id])
 }
