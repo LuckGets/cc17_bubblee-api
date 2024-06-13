@@ -1,3 +1,4 @@
+const { response } = require("express");
 const carService = require("../services/carService");
 const reserveService = require("../services/reserveService");
 const userService = require("../services/userService");
@@ -188,6 +189,61 @@ reserveController.findUserIdByOrderId = asyncWrapper(async (req, res, next) => {
   res.status(200).json(userId);
 });
 
-reserveController.cancelOrder = asyncWrapper(async (req, res, next) => {});
+reserveController.cancelOrder = asyncWrapper(async (req, res, next) => {
+  const userId = await reserveService.findUserIdByOrderId(+req.params.orderId);
+  if (userId.userId !== req.user.id) {
+    throwError({
+      message: "Unauthorized",
+      statusCode: 401,
+    });
+  }
+
+  const response = await reserveService.cancelOrder(+req.params.orderId);
+  console.log(response);
+  res.status(204).json({ message: "Order cancel success" });
+});
+
+reserveController.findAllUnReservedOrder = asyncWrapper(
+  async (req, res, next) => {
+    if (req.user.role !== "ADMIN") {
+      throwError({
+        message: "Unauthorized",
+        statusCode: 401,
+      });
+    }
+
+    const orderArr = await reserveService.findAllUnReservedOrder();
+    if (!orderArr[0]) {
+      res
+        .status(200)
+        .json({ message: "There is no any unreserved order in database" });
+    }
+
+    const reserveArr = orderArr.reduce((acc, curr) => {
+      const objToPush = {};
+      objToPush.orderId = curr.id;
+      objToPush.pickupPlace = curr.pickupPlace;
+      objToPush.dropOffPlace = curr.dropOffPlace;
+      objToPush.pickUpTime = curr.pickUpTime;
+      objToPush.reservedAt = curr.reservedAt;
+      objToPush.totalCost = curr.totalCost;
+      objToPush.orderStatus = curr.orderStatus;
+      if (curr.userId) {
+        objToPush.userId = curr.userId;
+      }
+      if (curr.guestName && curr.guestPhone) {
+        objToPush.guestName = curr.guestName;
+        objToPush.guestPhone = curr.guestPhone;
+      }
+      objToPush.modelId = curr.modelId;
+      objToPush.transactionId = curr.transactionId;
+      objToPush.isRoundTrip = curr.isRoundTrip;
+      acc.push(objToPush);
+      return acc;
+    }, []);
+
+    res.status(200).json(reserveArr);
+  }
+);
 
 module.exports = reserveController;

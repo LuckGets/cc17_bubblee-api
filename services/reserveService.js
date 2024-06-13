@@ -68,4 +68,21 @@ reserveService.findUserIdByOrderId = (orderId) =>
     },
   });
 
+reserveService.cancelOrder = (orderId) =>
+  prisma.reservation.update({
+    where: {
+      id: orderId,
+    },
+    data: {
+      orderStatus: "CANCEL",
+    },
+  });
+
+reserveService.findAllUnReservedOrder = () =>
+  prisma.reservation.findMany({
+    where: {
+      orderStatus: "FINDING",
+    },
+  });
+
 module.exports = reserveService;

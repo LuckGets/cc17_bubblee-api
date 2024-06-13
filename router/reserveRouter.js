@@ -26,6 +26,12 @@ router.get(
   reserveController.findUserIdByOrderId
 );
 
-router.delete("/history/:orderId");
+router.get(
+  "/history/all",
+  authenticate,
+  reserveController.findAllUnReservedOrder
+);
+
+router.delete("/history/:orderId", authenticate, reserveController.cancelOrder);
 
 module.exports = router;
