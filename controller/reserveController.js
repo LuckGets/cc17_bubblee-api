@@ -1,4 +1,3 @@
-const { response } = require("express");
 const carService = require("../services/carService");
 const reserveService = require("../services/reserveService");
 const userService = require("../services/userService");
