@@ -245,4 +245,20 @@ reserveController.findAllUnReservedOrder = asyncWrapper(
   }
 );
 
+reserveController.assignDriverToOrder = asyncWrapper(async (req, res, next) => {
+  if (req.user.role !== "ADMIN") {
+    throwError({
+      message: "Unauthenticated",
+      statusCode: 401,
+    });
+  }
+
+  await reserveService.assignCarIdToOrder(
+    +req.params.orderId,
+    req.body.carId,
+    req.body.driverId
+  );
+  res.status(200).json({ message: "Assign driver to order successfully." });
+});
+
 module.exports = reserveController;

@@ -34,12 +34,12 @@ carService.getAllCar = () =>
     },
   });
 
-carService.filterCarModelByTime = (time) =>
+carService.filterCarModelByTime = (time, pickUpMinus) =>
   prisma.reservation.groupBy({
     by: ["modelId"],
     where: {
       pickUpTime: {
-        lte: time,
+        lte: pickUpMinus,
       },
       estimatedFinishTime: {
         gte: time,
@@ -71,6 +71,31 @@ carService.getCarImageByFilteringId = (modelId) =>
     },
   });
 
+carService.findCarMatchTime = (
+  pickUpTime,
+  pickUpMinus,
+  finishTime,
+  finishPlus,
+  modelId
+) =>
+  prisma.reservation.findMany({
+    where: {
+      modelId,
+      pickUpTime: {
+        gte: pickUpTime,
+        lte: finishPlus,
+      },
+      estimatedFinishTime: {
+        gte: pickUpMinus,
+        lte: finishTime,
+      },
+      orderStatus: "RESERVED",
+    },
+    select: {
+      carId: true,
+    },
+  });
+
 carService.getAllCarImage = () => prisma.carImage.findMany();
 
 carService.getAllCarDetails = () => prisma.carsModel.findMany();
@@ -95,6 +120,19 @@ carService.getFilteredCarDetails = (modelId) =>
       id: {
         in: modelId,
       },
+    },
+  });
+
+carService.GetCarAndDriverByfilteredCarId = (carId, modelId) =>
+  prisma.cars.findMany({
+    where: {
+      id: {
+        notIn: carId,
+      },
+      modelId,
+    },
+    include: {
+      driver: true,
     },
   });
 

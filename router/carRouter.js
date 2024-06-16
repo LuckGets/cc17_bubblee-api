@@ -1,5 +1,6 @@
 const express = require("express");
 const carController = require("../controller/carController");
+const authenticate = require("../middlewares/authenticate");
 const router = express.Router();
 
 router.get("/image", carController.getAllCarImage);
@@ -15,4 +16,10 @@ router.post("/filter", carController.filteredCarByTime);
 router.post("/filterimage", carController.getFilteredCarMainImage);
 
 router.post("/filterdetail", carController.getFilteredCarDetails);
+
+router.post(
+  "/findcars",
+  authenticate,
+  carController.findUnReservedCarAndDriver
+);
 module.exports = router;

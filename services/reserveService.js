@@ -85,4 +85,16 @@ reserveService.findAllUnReservedOrder = () =>
     },
   });
 
+reserveService.assignCarIdToOrder = (id, carId, driverId) =>
+  prisma.reservation.update({
+    data: {
+      carId: carId,
+      driverId: driverId,
+      orderStatus: "RESERVED",
+    },
+    where: {
+      id,
+    },
+  });
+
 module.exports = reserveService;

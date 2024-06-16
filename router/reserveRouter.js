@@ -34,4 +34,10 @@ router.get(
 
 router.delete("/history/:orderId", authenticate, reserveController.cancelOrder);
 
+router.patch(
+  "/assign/:orderId",
+  authenticate,
+  reserveController.assignDriverToOrder
+);
+
 module.exports = router;
