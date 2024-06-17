@@ -37,9 +37,14 @@ carController.filteredCarByTime = asyncWrapper(async (req, res, next) => {
     acc[curr.modelId] = curr._count.modelId;
     return acc;
   }, {});
-  const carIdArr = await carService.countCarIdGroupByModelId();
+
+  const filteredCarByPassenger = await carService.filteredModelIdByPassenger(
+    req.body.passengerNum
+  );
+
+  const filteredCarMap = filteredCarByPassenger.map((item) => item.id);
+  const carIdArr = await carService.countCarIdGroupByModelId(filteredCarMap);
   const availCarArr = carIdArr.reduce((acc, curr) => {
-    console.log(curr._count.id, reduceCarArr[curr.modelId]);
     if (
       reduceCarArr[curr.modelId] &&
       curr._count.id < reduceCarArr[curr.modelId]
@@ -85,7 +90,6 @@ carController.getFilteredCarMainImage = asyncWrapper(async (req, res, next) => {
 
 carController.getFilteredCarDetails = asyncWrapper(async (req, res, next) => {
   const carDetail = await carService.getFilteredCarDetails(req.body.modelId);
-  console.log(carDetail);
   res.status(200).json(carDetail);
 });
 module.exports = carController;

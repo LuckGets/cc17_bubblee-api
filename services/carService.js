@@ -50,10 +50,27 @@ carService.filterCarModelByTime = (time, pickUpMinus) =>
     },
   });
 
-carService.countCarIdGroupByModelId = () =>
+carService.countCarIdGroupByModelId = (model) =>
   prisma.cars.groupBy({
     by: ["modelId"],
+    where: {
+      modelId: {
+        notIn: model,
+      },
+    },
     _count: {
+      id: true,
+    },
+  });
+
+carService.filteredModelIdByPassenger = (passenger) =>
+  prisma.carsModel.findMany({
+    where: {
+      maxPassengerNum: {
+        lte: passenger,
+      },
+    },
+    select: {
       id: true,
     },
   });

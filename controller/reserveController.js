@@ -141,8 +141,11 @@ reserveController.findAllReserveHistoryByUserId = asyncWrapper(
       });
     }
 
+    const todayDate = Date.now();
+
     const reserveArr = await reserveService.findReserveHistoryByUserId(
-      req.user.id
+      req.user.id,
+      todayDate.toString()
     );
 
     const reserveHistory = reserveArr.reduce((acc, curr) => {
@@ -259,6 +262,18 @@ reserveController.assignDriverToOrder = asyncWrapper(async (req, res, next) => {
     req.body.driverId
   );
   res.status(200).json({ message: "Assign driver to order successfully." });
+});
+
+reserveController.getAllOrder = asyncWrapper(async (req, res, next) => {
+  if (req.user.role !== "ADMIN") {
+    throwError({
+      message: "Unauthorized",
+      statusCode: 401,
+    });
+  }
+
+  const orderArr = await reserveService.findEveryOrder();
+  res.status(200).json(orderArr);
 });
 
 module.exports = reserveController;

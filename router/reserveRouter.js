@@ -27,7 +27,7 @@ router.get(
 );
 
 router.get(
-  "/history/all",
+  "/history/allunreserved",
   authenticate,
   reserveController.findAllUnReservedOrder
 );
@@ -39,5 +39,7 @@ router.patch(
   authenticate,
   reserveController.assignDriverToOrder
 );
+
+router.get("/history/all", authenticate, reserveController.getAllOrder);
 
 module.exports = router;

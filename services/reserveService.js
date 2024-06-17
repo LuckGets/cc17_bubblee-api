@@ -48,10 +48,13 @@ reserveService.findReserveDetailByOrderId = (id) =>
     where: { id },
   });
 
-reserveService.findReserveHistoryByUserId = (userId) =>
+reserveService.findReserveHistoryByUserId = (userId, time) =>
   prisma.reservation.findMany({
     where: {
       userId: userId,
+      pickUpTime: {
+        gte: time,
+      },
     },
     include: {
       carModel: true,
@@ -96,5 +99,7 @@ reserveService.assignCarIdToOrder = (id, carId, driverId) =>
       id,
     },
   });
+
+reserveService.findEveryOrder = () => prisma.reservation.findMany();
 
 module.exports = reserveService;
