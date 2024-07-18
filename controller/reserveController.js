@@ -1,6 +1,7 @@
 const carService = require("../services/carService");
 const reserveService = require("../services/reserveService");
 const userService = require("../services/userService");
+const adminAuthen = require("../utils/adminAuthen");
 const asyncWrapper = require("../utils/asyncWrapper");
 const throwError = require("../utils/throwError");
 
@@ -141,11 +142,11 @@ reserveController.findAllReserveHistoryByUserId = asyncWrapper(
       });
     }
 
-    const todayDate = Date.now();
+    const todayDate = new Date(Date.now());
 
     const reserveArr = await reserveService.findReserveHistoryByUserId(
       req.user.id,
-      todayDate.toString()
+      todayDate.toISOString()
     );
 
     const reserveHistory = reserveArr.reduce((acc, curr) => {
@@ -200,8 +201,7 @@ reserveController.cancelOrder = asyncWrapper(async (req, res, next) => {
     });
   }
 
-  const response = await reserveService.cancelOrder(+req.params.orderId);
-  console.log(response);
+  await reserveService.cancelOrder(+req.params.orderId);
   res.status(204).json({ message: "Order cancel success" });
 });
 
@@ -249,13 +249,6 @@ reserveController.findAllUnReservedOrder = asyncWrapper(
 );
 
 reserveController.assignDriverToOrder = asyncWrapper(async (req, res, next) => {
-  if (req.user.role !== "ADMIN") {
-    throwError({
-      message: "Unauthenticated",
-      statusCode: 401,
-    });
-  }
-
   await reserveService.assignCarIdToOrder(
     +req.params.orderId,
     req.body.carId,
@@ -265,15 +258,53 @@ reserveController.assignDriverToOrder = asyncWrapper(async (req, res, next) => {
 });
 
 reserveController.getAllOrder = asyncWrapper(async (req, res, next) => {
-  if (req.user.role !== "ADMIN") {
-    throwError({
-      message: "Unauthorized",
-      statusCode: 401,
-    });
-  }
-
   const orderArr = await reserveService.findEveryOrder();
   res.status(200).json(orderArr);
+});
+
+reserveController.findTodayOrders = asyncWrapper(async (req, res, next) => {
+  const todayDateInMilli = Date.now();
+  const tomorrowInMilli = todayDateInMilli + 24 * 60 * 60 * 1000;
+  const tomorrow = new Date(tomorrowInMilli);
+  const todayDate = new Date(todayDateInMilli);
+  const orderArr = await reserveService.findTodayOrders(todayDate, tomorrow);
+  res.status(200).json(orderArr);
+});
+
+reserveController.findExpiredOrder = asyncWrapper(async (req, res, next) => {
+  const today = new Date(Date.now());
+  const expiredOrderArr = await reserveService.findExpiredOrder(today);
+  res.status(200).json(expiredOrderArr);
+});
+
+reserveController.finishingJob = asyncWrapper(async (req, res, next) => {
+  await reserveService.finishingOrder(+req.params.orderId);
+  res
+    .status(200)
+    .json({ message: `Edit order ${+req.params.orderId} to FINISHED` });
+});
+
+reserveController.cancelJob = asyncWrapper(async (req, res, next) => {
+  await reserveService.cancelOrder(+req.params.orderId);
+  res
+    .status(200)
+    .json({ message: `Change irder ${+req.params.orderId} to CANCEL` });
+});
+
+reserveController.userEditReserve = asyncWrapper(async (req, res, next) => {
+  if (!req.body) {
+    throwError({
+      message: "Request body is empty",
+      statusCode: 400,
+    });
+  }
+  const { id } = req.body;
+  delete req.body.id;
+  const order = await reserveService.editReservation(req.body, id);
+  res.status(200).json({
+    message: `Order ${order.id} have been updated. Please proceed to transaction`,
+    id: order.id,
+  });
 });
 
 module.exports = reserveController;

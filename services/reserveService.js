@@ -4,6 +4,14 @@ const reserveService = {};
 reserveService.createReserveOrder = (data) =>
   prisma.reservation.create({ data });
 
+reserveService.editReservation = (data, id) =>
+  prisma.reservation.update({
+    where: {
+      id,
+    },
+    data,
+  });
+
 reserveService.findOrderIdByData = (data) =>
   prisma.reservation.findFirst({
     where: {
@@ -102,4 +110,42 @@ reserveService.assignCarIdToOrder = (id, carId, driverId) =>
 
 reserveService.findEveryOrder = () => prisma.reservation.findMany();
 
+reserveService.findTodayOrders = (today, tomorrow) =>
+  prisma.reservation.findMany({
+    where: {
+      pickUpTime: {
+        gte: today,
+        lte: tomorrow,
+      },
+    },
+  });
+
+reserveService.findExpiredOrder = (today) =>
+  prisma.reservation.findMany({
+    where: {
+      pickUpTime: {
+        lte: today,
+      },
+    },
+  });
+
+reserveService.finishingOrder = (id) =>
+  prisma.reservation.update({
+    where: {
+      id,
+    },
+    data: {
+      orderStatus: "FINISHED",
+    },
+  });
+
+reserveService.cancelOrder = (id) =>
+  prisma.reservation.update({
+    where: {
+      id,
+    },
+    data: {
+      orderStatus: "CANCEL",
+    },
+  });
 module.exports = reserveService;
