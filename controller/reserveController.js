@@ -1,3 +1,4 @@
+const { connect } = require("../router/reserveRouter");
 const carService = require("../services/carService");
 const reserveService = require("../services/reserveService");
 const userService = require("../services/userService");
@@ -14,7 +15,11 @@ reserveController.createReserve = asyncWrapper(async (req, res, next) => {
       statusCode: 400,
     });
   }
-
+  req.body.isRoundTrip = false;
+  req.body.user = { connect: { id: req.body.userId } };
+  req.body.carModel = { connect: { id: req.body.modelId } };
+  delete req.body.modelId;
+  delete req.body.userId;
   const order = await reserveService.createReserveOrder(req.body);
   res.status(201).json({
     message: "Order created. Please proceed to transaction",

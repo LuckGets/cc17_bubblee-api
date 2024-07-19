@@ -124,6 +124,6 @@ model Reservation {
   user          Users?       @relation(fields: [userId], references: [id])
   driver        Drivers?     @relation(fields: [driverId], references: [id])
   car           Cars?        @relation(fields: [carId], references: [id])
-  carModel      CarsModel    @relation(fields: [modelId], references: [id])
+  carModel      CarsModel?   @relation(fields: [modelId], references: [id])
   transction    Transaction? @relation(fields: [transactionId], references: [id])
 }
